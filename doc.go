@@ -7,31 +7,31 @@ This package relies heavily on reflect, turn back now if this makes you feel un-
 
 Usage
 
-queryString := `
-{
-  "foo": {
-    "$eq": "bar"
-  }
-}
-`
-docsString := `[
-  {
-    "foo": "bar"
-  },
-  {
-    "foo": "baz"
-  },
-  {
-    "baz": "qux"
-  }
-]`
+	queryString := `
+	{
+		"foo": {
+			"$eq": "bar"
+		}
+	}
+	`
+	docsString := `[
+		{
+			"foo": "bar"
+		},
+		{
+			"foo": "baz"
+		},
+		{
+			"baz": "qux"
+		}
+	]`
 
-var query interface{}
-var docs interface{}
-json.Unmarshal([]byte(queryString), &query)
-json.Unmarshal([]byte(docsString), &docs)
+	var query interface{}
+	var docs interface{}
+	json.Unmarshal([]byte(queryString), &query)
+	json.Unmarshal([]byte(docsString), &docs)
 
-results := siftjs.Sift(query, docs)
-// [{"foo":"bar"}]
+	results := siftjs.Sift(query, docs)
+	// [{"foo":"bar"}]
 */
 package siftjs
