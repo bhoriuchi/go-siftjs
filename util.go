@@ -7,7 +7,7 @@ import (
 )
 
 // GetKind strips the pointer and interface from the kind
-func GetKind(value interface{}) reflect.Kind {
+func getKind(value interface{}) reflect.Kind {
 	rv := reflect.ValueOf(value)
 	for rv.Kind() == reflect.Ptr || rv.Kind() == reflect.Interface {
 		rv = rv.Elem()
@@ -16,18 +16,18 @@ func GetKind(value interface{}) reflect.Kind {
 }
 
 // IsString check if the interface is a string
-func IsString(value interface{}) bool {
-	return GetKind(value) == reflect.String
+func isString(value interface{}) bool {
+	return getKind(value) == reflect.String
 }
 
 // IsMap check if the interface is a map
-func IsMap(value interface{}) bool {
-	return GetKind(value) == reflect.Map
+func isMap(value interface{}) bool {
+	return getKind(value) == reflect.Map
 }
 
 // IsArrayLike check if the interface is a slice or array
-func IsArrayLike(value interface{}) bool {
-	switch kind := GetKind(value); kind {
+func isArrayLike(value interface{}) bool {
+	switch kind := getKind(value); kind {
 	case reflect.Slice, reflect.Array:
 		return true
 	default:
@@ -36,8 +36,8 @@ func IsArrayLike(value interface{}) bool {
 }
 
 // IsNumberLike check if interface is an int
-func IsNumberLike(value interface{}) bool {
-	switch kind := GetKind(value); kind {
+func isNumberLike(value interface{}) bool {
+	switch kind := getKind(value); kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64, reflect.Float32, reflect.Float64:
 		return true
 	default:
@@ -46,8 +46,8 @@ func IsNumberLike(value interface{}) bool {
 }
 
 // IsIntLike check if interface is an int
-func IsIntLike(value interface{}) bool {
-	switch kind := GetKind(value); kind {
+func isIntLike(value interface{}) bool {
+	switch kind := getKind(value); kind {
 	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
 		return true
 	default:
@@ -56,14 +56,14 @@ func IsIntLike(value interface{}) bool {
 }
 
 // Mapify turns an interface into a map
-func Mapify(src interface{}) (map[string]interface{}, error) {
+func mapify(src interface{}) (map[string]interface{}, error) {
 	m := make(map[string]interface{})
 
-	if !IsMap(src) {
+	if !isMap(src) {
 		return m, fmt.Errorf("invalid map")
 	}
 
-	if err := ToInterface(src, &m); err != nil {
+	if err := toInterface(src, &m); err != nil {
 		return m, err
 	}
 
@@ -71,16 +71,16 @@ func Mapify(src interface{}) (map[string]interface{}, error) {
 }
 
 // Arrayify turns an interface into a map
-func Arrayify(src interface{}) ([]interface{}, error) {
+func arrayify(src interface{}) ([]interface{}, error) {
 	m := make([]interface{}, 0)
 
 	// make array if not an array
-	if !IsArrayLike(src) {
+	if !isArrayLike(src) {
 		a := make([]interface{}, 0)
 		src = append(a, src)
 	}
 
-	if err := ToInterface(src, &m); err != nil {
+	if err := toInterface(src, &m); err != nil {
 		return m, err
 	}
 
@@ -88,7 +88,7 @@ func Arrayify(src interface{}) ([]interface{}, error) {
 }
 
 // ToInterface converts one interface to another using json
-func ToInterface(src interface{}, dest interface{}) error {
+func toInterface(src interface{}, dest interface{}) error {
 	b, err := json.Marshal(src)
 	if err != nil {
 		return err

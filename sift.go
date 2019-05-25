@@ -9,10 +9,10 @@ import (
 
 // in is true if the array contains a value
 func in(val interface{}, slice interface{}) bool {
-	if !IsArrayLike(slice) {
+	if !isArrayLike(slice) {
 		return false
 	}
-	a, err := Arrayify(slice)
+	a, err := arrayify(slice)
 	if err != nil {
 		return false
 	}
@@ -28,17 +28,17 @@ func in(val interface{}, slice interface{}) bool {
 // all returns true if the document array contains all
 // the values in the query array
 func all(val interface{}, querySlice interface{}) bool {
-	if !IsArrayLike(querySlice) {
+	if !isArrayLike(querySlice) {
 		return false
 	}
-	if !IsArrayLike(val) {
+	if !isArrayLike(val) {
 		return false
 	}
-	v, err := Arrayify(val)
+	v, err := arrayify(val)
 	if err != nil {
 		return false
 	}
-	q, err := Arrayify(querySlice)
+	q, err := arrayify(querySlice)
 	if err != nil {
 		return false
 	}
@@ -66,7 +66,7 @@ func all(val interface{}, querySlice interface{}) bool {
 
 // lt returns true if the document value is less than the query value
 func lt(left interface{}, right interface{}) bool {
-	if IsNumberLike(left) && IsNumberLike(right) {
+	if isNumberLike(left) && isNumberLike(right) {
 		leftFloat, _ := strconv.ParseFloat(fmt.Sprintf("%v", left), 64)
 		rightFloat, _ := strconv.ParseFloat(fmt.Sprintf("%v", right), 64)
 		return leftFloat < rightFloat
@@ -81,7 +81,7 @@ func lte(left interface{}, right interface{}) bool {
 
 // tt returns true if the document value is greater than the query value
 func gt(left interface{}, right interface{}) bool {
-	if IsNumberLike(left) && IsNumberLike(right) {
+	if isNumberLike(left) && isNumberLike(right) {
 		leftFloat, _ := strconv.ParseFloat(fmt.Sprintf("%v", left), 64)
 		rightFloat, _ := strconv.ParseFloat(fmt.Sprintf("%v", right), 64)
 		return leftFloat > rightFloat
@@ -96,7 +96,7 @@ func gte(left interface{}, right interface{}) bool {
 
 // and returns true if all sub-queries return true
 func and(doc interface{}, querys interface{}) bool {
-	qs, err := Arrayify(querys)
+	qs, err := arrayify(querys)
 	if err != nil {
 		return false
 	}
@@ -111,7 +111,7 @@ func and(doc interface{}, querys interface{}) bool {
 // regex returns true if the regex matches the document value
 func regex(val interface{}, rx interface{}) bool {
 	// both sides must be a string to do an rx comparison
-	if !IsString(val) || !IsString(rx) {
+	if !isString(val) || !isString(rx) {
 		return false
 	}
 	// extract the javascript style regex
@@ -137,7 +137,7 @@ func regex(val interface{}, rx interface{}) bool {
 
 // or returns true if at least one sub-query returns true
 func or(doc interface{}, querys interface{}) bool {
-	qs, err := Arrayify(querys)
+	qs, err := arrayify(querys)
 	if err != nil {
 		return false
 	}
@@ -151,10 +151,10 @@ func or(doc interface{}, querys interface{}) bool {
 
 // size returns true if the document value is an array of the size specified
 func size(doc interface{}, s interface{}) bool {
-	if !IsArrayLike(doc) || !IsIntLike(s) {
+	if !isArrayLike(doc) || !isIntLike(s) {
 		return false
 	}
-	a, err := Arrayify(doc)
+	a, err := arrayify(doc)
 	if err != nil {
 		return false
 	}
@@ -164,8 +164,8 @@ func size(doc interface{}, s interface{}) bool {
 // compare compares the document value to the query
 func compare(query interface{}, doc interface{}) bool {
 	// if the query is an array, treat it as an OR query
-	if IsArrayLike(query) {
-		a, err := Arrayify(query)
+	if isArrayLike(query) {
+		a, err := arrayify(query)
 		if err != nil {
 			return false
 		}
@@ -178,12 +178,12 @@ func compare(query interface{}, doc interface{}) bool {
 
 	// if the query is not a map or array/slice we are at the value
 	// use deepequal to compare
-	if !IsMap(query) {
+	if !isMap(query) {
 		return reflect.DeepEqual(query, doc)
 	}
 
 	// convert query to a map of interfaces
-	q, err := Mapify(query)
+	q, err := mapify(query)
 	if err != nil {
 		return false
 	}
@@ -228,8 +228,8 @@ func compare(query interface{}, doc interface{}) bool {
 		case "$not":
 			res = !compare(doc, v)
 		default:
-			if IsMap(doc) {
-				m, err := Mapify(doc)
+			if isMap(doc) {
+				m, err := mapify(doc)
 				if err != nil {
 					return false
 				}
@@ -253,7 +253,7 @@ func compare(query interface{}, doc interface{}) bool {
 // Sift sifts an interface returning an array/slice of matches
 func Sift(query interface{}, docs interface{}) []interface{} {
 	result := make([]interface{}, 0)
-	d, err := Arrayify(docs)
+	d, err := arrayify(docs)
 	if err != nil {
 		return result
 	}
